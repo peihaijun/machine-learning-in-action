@@ -12,7 +12,7 @@ def jishiqi(func):
         return back,time.time()-time0
     return jishi
 
-# @jishiqi
+ # @jishiqi
 def calcShannonEnt(dataSet):
 #计算信息熵函数，信息熵越高的话，则混合的数据越多
     numEntries=len(dataSet)
@@ -62,7 +62,7 @@ def chooseBestFeatureTopSplit(dataSet):
     bestInfoGain=0.0;bestFeature=-1
     for i in range(numFeatures):
         featList=[example[i] for example in dataSet]#将数据集的某一列的所有数据送个这个列表
-        uniqueVals=set(featList)
+        uniqueVals=set(featList)#set() 函数创建一个无序不重复元素集，可进行关系测试，删除重复数据，还可以计算交集、差集、并集等
         newEntropy=0.0
         for value in uniqueVals:
             subDataSet=spiltDataSet(dataSet,i,value)
@@ -89,9 +89,9 @@ def majorityCnt(classList):
 def createTree(dataSet,labels):
     #创建决策树代码
     classList=[example[-1] for example in dataSet]
-    if classList.count(classList[0])==len(classList):
+    if classList.count(classList[0])==len(classList):#count()用于统计列表里某个项出现的次数,这里体现的是递归结束的第一个条件，是否剩下的都是同一个分类
         return classList[0]
-    if len(dataSet[0])==1:
+    if len(dataSet[0])==1:#这里体现的是第二个条件，是否已经遍历完整个列表
         return majorityCnt(classList)
     bestFeat=chooseBestFeatureTopSplit(dataSet)
     bestFeatLabel=labels[bestFeat]
@@ -115,7 +115,7 @@ mydata,mylabels=creatDataSet()
 # mydata[0][-1]='maybe'
 # result=calcShannonEnt(mydata)
 # result=spiltDataSet(mydata,0,1)
-result=chooseBestFeatureTopSplit(mydata)
+result=createTree(mydata,mylabels)
 print result
 
 
