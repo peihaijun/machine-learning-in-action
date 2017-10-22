@@ -110,13 +110,18 @@ def createTree(dataSet,labels):
 
 
 # # yun xing
-mydata,mylabels=creatDataSet()
+# mydata,mylabels=creatDataSet()
 # print mydata,mylabels
 # mydata[0][-1]='maybe'
 # result=calcShannonEnt(mydata)
 # result=spiltDataSet(mydata,0,1)
-result=createTree(mydata,mylabels)
-print result
+# result=createTree(mydata,mylabels)
+# print result
+def add(a,b):
+    a+=1
+    b+=2
+    return a,b
+print add(1,2)
 
 
 

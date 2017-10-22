@@ -3,17 +3,18 @@ import matplotlib.pyplot as plt
 import time
 
 def jishiqi(func):
-    def jishi(*args,**kwargs):
+    def jishi(*args,**args2):
         time0=time.time()
-        back=func(*args,**kwargs)
-        return back,time.time()-time0
+        back=func(*args,**args2)
+        # print
+        return back,time.time()-time0#问题：函数添加装饰器后，函数的返回会变成一个元组，这样的话，就无法进行原来的计算了？？？？？
     return jishi
 
-decisionNode = dict(boxstyle="sawtooth", fc="0.8")
-leafNode = dict(boxstyle="round4", fc="0.8")
-arrow_args = dict(arrowstyle="<-")
+decisionNode = dict(boxstyle="sawtooth", fc="0.8")#定义断点节点的形态
+leafNode = dict(boxstyle="round4", fc="0.8")#定义叶节点的形态
+arrow_args = dict(arrowstyle="<-")#定义箭头
 
-
+#计算树的叶节点数
 def getNumLeafs(myTree):
     numLeafs = 0
     firstStr = myTree.keys()[0]
@@ -26,7 +27,7 @@ def getNumLeafs(myTree):
             numLeafs += 1
     return numLeafs
 
-#计算树的层数
+#计算树的深度
 def getTreeDepth(myTree):
     maxDepth = 0
     firstStr = myTree.keys()[0]
@@ -40,28 +41,36 @@ def getTreeDepth(myTree):
         if thisDepth > maxDepth: maxDepth = thisDepth
     return maxDepth
 
-def shendu(mytree):
-    jian=mytree.keys()[0]
-    i=0
-    if  type(mytree[jian]).__name__=='dict':
-        i+=1
-        xintree=mytree[jian]
-        # xinjianlength=len(xintree.keys())
-        for n in xintree.keys():
-            if type(xintree[n]).__name__=='dict':
-                i=i+shendu(xintree[n])
-
-    return i
+# @jishiqi
+# def shendu(mytree):
+#     #自定义计算树的层数函数
+#     jian=mytree.keys()[0]
+#     i=0
+#     if  type(mytree[jian]).__name__=='dict':
+#         i+=1
+#         xintree=mytree[jian]
+#         # xinjianlength=len(xintree.keys())
+#         for n in xintree.keys():
+#             if type(xintree[n]).__name__=='dict':
+#                 i=i+shendu(xintree[n])
+#
+#     return i
+#绘制带箭头的注解
+#nodeTxt：节点的文字标注, centerPt：节点中心位置,
+#parentPt：箭头起点位置（上一节点位置）, nodeType：节点属性
 def plotNode(nodeTxt, centerPt, parentPt, nodeType):
+    # 绘制箭头和节点
     createPlot.ax1.annotate(nodeTxt, xy=parentPt, xycoords='axes fraction',
                             xytext=centerPt, textcoords='axes fraction',
                             va="center", ha="center", bbox=nodeType, arrowprops=arrow_args)
 
-
+#在父子节点间填充文本信息
+#cntrPt:子节点位置, parentPt：父节点位置, txtString：标注内容
 def plotMidText(cntrPt, parentPt, txtString):
-    xMid = (parentPt[0] - cntrPt[0]) / 2.0 + cntrPt[0]
-    yMid = (parentPt[1] - cntrPt[1]) / 2.0 + cntrPt[1]
-    createPlot.ax1.text(xMid, yMid, txtString, va="center", ha="center", rotation=30)
+    # 在父节点和子节点之间添加信息
+    xMid = (parentPt[0] - cntrPt[0]) / 2.0 + cntrPt[0]#找到父节点和子节点的中间点的x坐标
+    yMid = (parentPt[1] - cntrPt[1]) / 2.0 + cntrPt[1]#找到父节点和子节点的中间点的y坐标
+    createPlot.ax1.text(xMid, yMid, txtString, va="center", ha="center", rotation=30)#rotation是把传入的参数都旋转了30度
 
 #绘制树图形，myTree树的字典，parentPt父节点，nodeTxt节点的文字标注
 def plotTree(myTree, parentPt, nodeTxt):
@@ -69,19 +78,19 @@ def plotTree(myTree, parentPt, nodeTxt):
     depth = getTreeDepth(myTree)#树的层数
     firstStr = myTree.keys()[0]  #节点标签
     #计算当前节点的位置
-    cntrPt = (plotTree.xOff + (1.0 + float(numLeafs)) / 2.0 / plotTree.totalW, plotTree.yOff)
+    cntrPt = (plotTree.xOff + (1.0 + float(numLeafs)) / 2.0 / plotTree.totalW, plotTree.yOff)#计算当前叶子的坐标，plotTree.xOff是上一个叶子的坐标，plotTree.totalW是总的叶子的数目
     plotMidText(cntrPt, parentPt, nodeTxt)#在父节点间填充文本信息
     plotNode(firstStr, cntrPt, parentPt, decisionNode)
     secondDict = myTree[firstStr]
     plotTree.yOff = plotTree.yOff - 1.0 / plotTree.totalD
     for key in secondDict.keys():
         if type(secondDict[
-                    key]).__name__ == 'dict':  #判断是不是字典
+                    key]).__name__ == 'dict':  #判断是不是字典，是字典进行递归，不是字典直接画图
             plotTree(secondDict[key], cntrPt, str(key))  #递归绘制树形图
         else:  # 如果是叶节点
             plotTree.xOff = plotTree.xOff + 1.0 / plotTree.totalW
-            plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), cntrPt, leafNode)
-            plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))
+            plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), cntrPt, leafNode)#绘制箭头和节点
+            plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))#在父节点和子节点之间添加信息
     plotTree.yOff = plotTree.yOff + 1.0 / plotTree.totalD
 
 
@@ -199,9 +208,8 @@ mytree=retrieveTree(1)
 # # print result
 # mytree=retrieveTree(1)
 # print getTreeDepth(mytree)
-shendu=jishiqi(shendu)
-print shendu(mytree)
-#问题：函数添加装饰器后，函数的返回会变成一个元组，这样的话，就无法进行原来的计算了？？？？？
+# print shendu(mytree)
+
 
 # print getNumLeafs(mytree)
-# createPlot(mytree)
+createPlot(mytree)
