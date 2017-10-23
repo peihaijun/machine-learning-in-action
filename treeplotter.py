@@ -78,9 +78,10 @@ def plotTree(myTree, parentPt, nodeTxt):
     depth = getTreeDepth(myTree)#树的层数
     firstStr = myTree.keys()[0]  #节点标签
     #计算当前节点的位置
-    cntrPt = (plotTree.xOff + (1.0 + float(numLeafs)) / 2.0 / plotTree.totalW, plotTree.yOff)#计算当前叶子的坐标，plotTree.xOff是上一个叶子的坐标，plotTree.totalW是总的叶子的数目
+    # cntrPt = ( (float(numLeafs))/ 2.0 / plotTree.totalW, plotTree.yOff)#计算当前节点的坐标，plotTree.xOff是上一个叶子的坐标，plotTree.totalW是总的叶子的数目
+    cntrPt = (plotTree.xOff + (1.0 + float(numLeafs)) / 2.0 / plotTree.totalW, plotTree.yOff)#计算当前节点的坐标，plotTree.xOff是上一个叶子的坐标，plotTree.totalW是总的叶子的数目
     plotMidText(cntrPt, parentPt, nodeTxt)#在父节点间填充文本信息
-    plotNode(firstStr, cntrPt, parentPt, decisionNode)
+    plotNode(firstStr, cntrPt, parentPt, decisionNode)#绘制节点
     secondDict = myTree[firstStr]
     plotTree.yOff = plotTree.yOff - 1.0 / plotTree.totalD
     for key in secondDict.keys():
@@ -88,8 +89,8 @@ def plotTree(myTree, parentPt, nodeTxt):
                     key]).__name__ == 'dict':  #判断是不是字典，是字典进行递归，不是字典直接画图
             plotTree(secondDict[key], cntrPt, str(key))  #递归绘制树形图
         else:  # 如果是叶节点
-            plotTree.xOff = plotTree.xOff + 1.0 / plotTree.totalW
-            plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), cntrPt, leafNode)#绘制箭头和节点
+            plotTree.xOff = plotTree.xOff + 1.0 / plotTree.totalW#计算叶子的坐标，plotTree.xOff是上一个叶子的坐标
+            plotNode(secondDict[key], (plotTree.xOff, plotTree.yOff), cntrPt, leafNode)#绘制箭头和叶子
             plotMidText((plotTree.xOff, plotTree.yOff), cntrPt, str(key))#在父节点和子节点之间添加信息
     plotTree.yOff = plotTree.yOff + 1.0 / plotTree.totalD
 
@@ -204,7 +205,7 @@ def retrieveTree(i):
 #             plotMidText((plotTree.xOff,plotTree.yOff),cntrPt,str(key))
 #         plotTree.yOff=plotTree.yOff+1.0/plotTree.totalD
 #
-mytree=retrieveTree(1)
+# mytree=retrieveTree(0)
 # # print result
 # mytree=retrieveTree(1)
 # print getTreeDepth(mytree)
@@ -212,4 +213,4 @@ mytree=retrieveTree(1)
 
 
 # print getNumLeafs(mytree)
-createPlot(mytree)
+# createPlot(mytree)

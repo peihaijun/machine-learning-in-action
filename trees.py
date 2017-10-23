@@ -3,7 +3,7 @@ from math import log
 import time
 
 import operator
-
+import treeplotter
 
 def jishiqi(func):
     def jishi(*args,**kwargs):
@@ -11,6 +11,8 @@ def jishiqi(func):
         back=func(*args,**kwargs)
         return back,time.time()-time0
     return jishi
+
+
 
  # @jishiqi
 def calcShannonEnt(dataSet):
@@ -106,6 +108,43 @@ def createTree(dataSet,labels):
     return mytree
 
 
+def classify(inputTree,featLabels,testVec):
+    firstStr = inputTree.keys()[0]
+    secondDict = inputTree[firstStr]
+    featIndex = featLabels.index(firstStr)
+    key = testVec[featIndex]
+    valueOfFeat = secondDict[key]
+    if isinstance(valueOfFeat, dict):
+        classLabel = classify(valueOfFeat, featLabels, testVec)
+    else: classLabel = valueOfFeat
+    return classLabel
+
+
+
+def classify(inputTree,featLabels,testVec):
+    firstStr=inputTree.keys()[0]
+    secondDict=inputTree[firstStr]
+    featIndex=featLabels.index(firstStr)
+    for key in secondDict.keys():
+        if testVec[featIndex]==key:
+            if type(secondDict[key]).__name__=='dict':
+                classLabel=classify(secondDict[key],featLabels,testVec)
+            else: classLabel=secondDict[key]
+    return classLabel
+
+
+
+
+#存储决策树
+def storeTree(inputTree,filename):
+    import pickle
+    fw=open(filename,'w')
+    pickle.dump(inputTree,fw)
+    fw.close()
+def grabTree(filename):
+    import pickle
+    fr=open(filename)
+    return pickle.load(fr)
 
 
 
@@ -115,13 +154,21 @@ def createTree(dataSet,labels):
 # mydata[0][-1]='maybe'
 # result=calcShannonEnt(mydata)
 # result=spiltDataSet(mydata,0,1)
-# result=createTree(mydata,mylabels)
+# mytree=createTree(mydata,mylabels)
+# print mytree
+# mytree=treeplotter.retrieveTree(0)
+# result=classify(mytree,mylabels,[1,0])
 # print result
-def add(a,b):
-    a+=1
-    b+=2
-    return a,b
-print add(1,2)
+# def add(a,b):
+#     a+=1
+#     b+=2
+#     return a,b
+# print add(1,2)
 
-
-
+# storeTree(mytree,'classifierStorage.txt')
+# print grabTree('classifierStorage.txt')
+fr=open('lenses.txt')
+lenses=[inst.strip().split('\t') for inst in fr.readlines()]
+lensesLabels=['age','prescript','astigmatic','tearRate']
+lensesTree=createTree(lenses,lensesLabels)
+treeplotter.createPlot(lensesTree)
